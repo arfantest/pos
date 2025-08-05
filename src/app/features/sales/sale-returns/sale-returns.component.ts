@@ -11,7 +11,7 @@ import { NzFormModule } from "ng-zorro-antd/form"
 import { NzSelectModule } from "ng-zorro-antd/select"
 import { NzMessageService } from "ng-zorro-antd/message"
 import { SaleService } from "../../../core/services/sale.service"
-import { Sale, SaleReturn } from "../../../core/models/sale.model"
+import { Sale } from "../../../core/models/sale.model"
 
 @Component({
   selector: "app-sale-returns",
@@ -163,7 +163,7 @@ import { Sale, SaleReturn } from "../../../core/models/sale.model"
   `,
 })
 export class SaleReturnsComponent implements OnInit {
-  returns: SaleReturn[] = []
+  returns: any[] = []
   sales: Sale[] = []
   loading = false
   processing = false
@@ -284,7 +284,7 @@ export class SaleReturnsComponent implements OnInit {
     this.isCreateReturnModalVisible = false
   }
 
-  viewReturn(returnRecord: SaleReturn): void {
+  viewReturn(returnRecord: any): void {
     // Implement view return details
     console.log("View return:", returnRecord)
   }

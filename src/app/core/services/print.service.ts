@@ -48,7 +48,7 @@ export class PrintService {
     }
   }
 
-  printElement(elementId: string): void {
+  printElement(elementId: string,text?:any): void {
     const element = document.getElementById(elementId)
     if (!element) {
       throw new Error("Element not found")
@@ -62,7 +62,7 @@ export class PrintService {
     printWindow.document.write(`
       <html>
         <head>
-          <title>Print</title>
+          <title>${text || 'Print'} </title>
           <style>
             body { font-family: Arial, sans-serif; margin: 20px; }
             table { width: 100%; border-collapse: collapse; margin: 10px 0; }

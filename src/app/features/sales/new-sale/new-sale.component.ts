@@ -15,7 +15,6 @@ import { NzGridModule } from "ng-zorro-antd/grid"
 import { ProductService } from "../../../core/services/product.service"
 import { SaleService } from "../../../core/services/sale.service"
 import { Product } from "../../../core/models/product.model"
-import { CreateSaleItemRequest } from "../../../core/models/sale.model"
 
 interface CartItem {
   product: Product
@@ -507,7 +506,7 @@ export class NewSaleComponent implements OnInit {
 
     this.processing = true
 
-    const saleItems: CreateSaleItemRequest[] = this.cart.map((item) => ({
+    const saleItems: any[] = this.cart.map((item) => ({
       productId: item.product.id,
       quantity: item.quantity,
       unitPrice: item.unitPrice,

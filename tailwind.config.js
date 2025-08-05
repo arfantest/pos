@@ -1,17 +1,10 @@
 /** @type {import('tailwindcss').Config} */
-const defaultConfig = require("shadcn/ui/tailwind.config")
-
 module.exports = {
-  ...defaultConfig,
   content: ["./src/**/*.{html,ts}", "*.{js,ts,jsx,tsx,mdx}"],
   theme: {
-    ...defaultConfig.theme,
     extend: {
-      ...defaultConfig.theme.extend,
       colors: {
-        ...defaultConfig.theme.extend.colors,
         primary: {
-          ...defaultConfig.theme.extend.colors.primary,
           50: "#e6f7ff",
           100: "#bae7ff",
           200: "#91d5ff",
@@ -59,9 +52,17 @@ module.exports = {
           800: "#820014",
           900: "#5c0011",
         },
-        fontFamily: {
-          sans: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "sans-serif"],
-        },
+      },
+      fontFamily: {
+        sans: [
+          "-apple-system",
+          "BlinkMacSystemFont",
+          "Segoe UI",
+          "Roboto",
+          "Helvetica Neue",
+          "Arial",
+          "sans-serif",
+        ],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -70,8 +71,10 @@ module.exports = {
       },
     },
   },
-  plugins: [...defaultConfig.plugins, require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+  ],
   corePlugins: {
     preflight: false,
   },
-}
+};

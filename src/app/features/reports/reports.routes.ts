@@ -12,7 +12,7 @@ export const routes: Routes = [
   },
   {
     path: "purchases",
-    // loadComponent: () => import("./purchase-report/purchase-report.component").then((m) => m.PurchaseReportComponent),
+    loadComponent: () => import("./purchase-report/purchase-report.component").then((m) => m.PurchaseReportComponent),
   },
   {
     path: "stock",
@@ -20,6 +20,6 @@ export const routes: Routes = [
   },
   {
     path: "returns",
-    // loadComponent: () => import("./returns-report/returns-report.component").then((m) => m.ReturnsReportComponent),
+    loadComponent: () => import("./returns-report/returns-report.component").then((m) => m.ReturnsReportComponent),
   },
 ]
