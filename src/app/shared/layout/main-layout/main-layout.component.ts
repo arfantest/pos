@@ -73,6 +73,13 @@ import { AuthService } from "../../../core/services/auth.service"
               </li>
             </ul>
           </li>
+          <li nz-submenu nzTitle="Expense" nzIcon="bar-chart">
+            <ul>
+              <li nz-menu-item nzMatchRouter>
+                <a routerLink="/expenses">Expenses</a>
+              </li>
+            </ul>
+          </li>
           <li nz-submenu nzTitle="Reports" nzIcon="bar-chart">
             <ul>
               <li nz-menu-item nzMatchRouter>

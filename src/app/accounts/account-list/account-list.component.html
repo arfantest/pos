@@ -1,0 +1,87 @@
+<div class="account-list-container">
+  <nz-breadcrumb>
+    <nz-breadcrumb-item>
+      <i nz-icon nzType="home"></i>
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>Account Management</nz-breadcrumb-item>
+  </nz-breadcrumb>
+
+  <div class="page-header">
+    <div class="header-content">
+      <h2>Chart of Accounts</h2>
+      <button nz-button nzType="primary" routerLink="/accounts/new">
+        <i nz-icon nzType="plus"></i>
+        Add Account
+      </button>
+    </div>
+  </div>
+
+  <nz-card>
+    <div class="table-operations">
+      <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
+        <input type="text" nz-input placeholder="Search accounts..." [(ngModel)]="searchValue" (input)="onSearch()" />
+      </nz-input-group>
+      <ng-template #suffixIconButton>
+        <button nz-button nzType="primary" nzSearch>
+          <i nz-icon nzType="search"></i>
+        </button>
+      </ng-template>
+    </div>
+
+    <nz-table #basicTable [nzData]="filteredAccounts" [nzLoading]="loading" nzShowSizeChanger>
+      <thead>
+        <tr>
+          <th nzColumnKey="code" [nzSortFn]="true">Code</th>
+          <th nzColumnKey="name" [nzSortFn]="true">Name</th>
+          <th nzColumnKey="type" [nzSortFn]="true">Type</th>
+          <th nzColumnKey="balance" [nzSortFn]="true">Balance</th>
+          <th nzColumnKey="status">Status</th>
+          <th nzWidth="120px">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let account of basicTable.data">
+          <td>{{ account.code }}</td>
+          <td>{{ account.name }}</td>
+          <td>
+            <nz-tag [nzColor]="getAccountTypeColor(account.type)">
+              {{ account.type }}
+            </nz-tag>
+          </td>
+          <td [class.negative-balance]="account.balance < 0">
+            {{ formatCurrency(account.balance) }}
+          </td>
+          <td>
+            <nz-tag [nzColor]="account.isActive ? 'green' : 'red'">
+              {{ account.isActive ? 'Active' : 'Inactive' }}
+            </nz-tag>
+          </td>
+          <td>
+            <a nz-dropdown [nzDropdownMenu]="menu" nzPlacement="bottomLeft">
+              <i nz-icon nzType="more" nzTheme="outline"></i>
+            </a>
+            <nz-dropdown-menu #menu="nzDropdownMenu">
+              <ul nz-menu>
+                <li nz-menu-item (click)="viewAccount(account)">
+                  <i nz-icon nzType="eye"></i>
+                  View Details
+                </li>
+                <li nz-menu-item (click)="editAccount(account)">
+                  <i nz-icon nzType="edit"></i>
+                  Edit
+                </li>
+                <li nz-menu-divider></li>
+                <li nz-menu-item nz-popconfirm 
+                    nzPopconfirmTitle="Are you sure you want to delete this account?"
+                    (nzOnConfirm)="deleteAccount(account)">
+                  <i nz-icon nzType="delete" style="color: #ff4d4f;"></i>
+                  <span style="color: #ff4d4f;">Delete</span>
+                </li>
+              </ul>
+            </nz-dropdown-menu>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>

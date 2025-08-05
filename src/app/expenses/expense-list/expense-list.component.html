@@ -1,0 +1,89 @@
+<div class="expense-list-container">
+  <nz-breadcrumb>
+    <nz-breadcrumb-item>
+      <i nz-icon nzType="home"></i>
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>Daily Expenses</nz-breadcrumb-item>
+  </nz-breadcrumb>
+
+  <div class="page-header">
+    <div class="header-content">
+      <h2>Daily Expenses</h2>
+      <button nz-button nzType="primary" routerLink="/expenses/new">
+        <i nz-icon nzType="plus"></i>
+        Add Expense
+      </button>
+    </div>
+  </div>
+
+  <!-- Summary Card -->
+  <div nz-row [nzGutter]="16" class="summary-section">
+    <div nz-col nzXs="24" nzSm="12" nzMd="8" nzLg="6">
+      <nz-card>
+        <nz-statistic 
+          nzTitle="Total Expenses" 
+          [nzValue]="totalExpenses" 
+          nzPrefix="$"
+          [nzValueStyle]="{ color: '#cf1322' }">
+        </nz-statistic>
+      </nz-card>
+    </div>
+  </div>
+
+  <nz-card>
+    <div class="table-operations">
+      <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
+        <input type="text" nz-input placeholder="Search expenses..." [(ngModel)]="searchValue" (input)="onSearch()" />
+      </nz-input-group>
+      <ng-template #suffixIconButton>
+        <button nz-button nzType="primary" nzSearch>
+          <i nz-icon nzType="search"></i>
+        </button>
+      </ng-template>
+    </div>
+
+    <nz-table #basicTable [nzData]="filteredExpenses" [nzLoading]="loading" nzShowSizeChanger>
+      <thead>
+        <tr>
+          <th nzColumnKey="date" [nzSortFn]="true">Date</th>
+          <th nzColumnKey="description" [nzSortFn]="true">Description</th>
+          <th nzColumnKey="category" [nzSortFn]="true">Category</th>
+          <th nzColumnKey="amount" [nzSortFn]="true">Amount</th>
+          <th nzColumnKey="receiptNumber">Receipt #</th>
+          <th nzWidth="120px">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let expense of basicTable.data">
+          <td>{{ formatDate(expense.date) }}</td>
+          <td>{{ expense.description }}</td>
+          <td>
+            <nz-tag nzColor="blue">{{ expense.category }}</nz-tag>
+          </td>
+          <td class="amount-cell">{{ formatCurrency(expense.amount) }}</td>
+          <td>{{ expense.receiptNumber || '-' }}</td>
+          <td>
+            <a nz-dropdown [nzDropdownMenu]="menu" nzPlacement="bottomLeft">
+              <i nz-icon nzType="more" nzTheme="outline"></i>
+            </a>
+            <nz-dropdown-menu #menu="nzDropdownMenu">
+              <ul nz-menu>
+                <li nz-menu-item (click)="editExpense(expense)">
+                  <i nz-icon nzType="edit"></i>
+                  Edit
+                </li>
+                <li nz-menu-divider></li>
+                <li nz-menu-item nz-popconfirm 
+                    nzPopconfirmTitle="Are you sure you want to delete this expense?"
+                    (nzOnConfirm)="deleteExpense(expense)">
+                  <i nz-icon nzType="delete" style="color: #ff4d4f;"></i>
+                  <span style="color: #ff4d4f;">Delete</span>
+                </li>
+              </ul>
+            </nz-dropdown-menu>
+          </td>
+        </tr>
+      </tbody>
+    </nz-table>
+  </nz-card>
+</div>

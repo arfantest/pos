@@ -1,0 +1,23 @@
+<div class="profit-loss-report" *ngIf="data">
+  <nz-descriptions nzBordered [nzColumn]="1">
+    <nz-descriptions-item nzTitle="Revenue">
+      <span class="amount positive">{{ formatCurrency(data.revenue) }}</span>
+    </nz-descriptions-item>
+    
+    <nz-descriptions-item nzTitle="Cost of Goods Sold">
+      <span class="amount negative">{{ formatCurrency(data.costOfGoodsSold) }}</span>
+    </nz-descriptions-item>
+    
+    <nz-descriptions-item nzTitle="Gross Profit">
+      <span class="amount" [class.positive]="data.grossProfit >= 0" [class.negative]="data.grossProfit < 0">
+        {{ formatCurrency(data.grossProfit) }}
+      </span>
+    </nz-descriptions-item>
+    
+    <nz-descriptions-item nzTitle="Gross Profit Margin">
+      <nz-tag [nzColor]="data.grossProfitMargin >= 0 ? 'green' : 'red'">
+        {{ formatPercentage(data.grossProfitMargin) }}
+      </nz-tag>
+    </nz-descriptions-item>
+  </nz-descriptions>
+</div>

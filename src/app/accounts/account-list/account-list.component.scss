@@ -1,0 +1,76 @@
+.account-list-container {
+  padding: 24px;
+  
+  .page-header {
+    margin: 16px 0 24px 0;
+    
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      
+      h2 {
+        margin: 0;
+        color: rgba(0, 0, 0, 0.85);
+        font-size: 24px;
+        font-weight: 600;
+      }
+    }
+  }
+  
+  .search-field {
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 16px;
+  }
+  
+  .table-operations {
+    margin-bottom: 16px;
+    
+    nz-input-group {
+      width: 300px;
+    }
+  }
+  
+  .table-container {
+    overflow-x: auto;
+    
+    .accounts-table {
+      width: 100%;
+      
+      .negative-balance {
+        color: #ff4d4f;
+        font-weight: 500;
+      }
+      
+      .delete-action {
+        color: #f44336;
+      }
+    }
+  }
+  
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 16px;
+    
+    .page-header .header-content {
+      flex-direction: column;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    
+    .search-field {
+      max-width: 100%;
+    }
+    
+    .table-operations nz-input-group {
+      width: 100%;
+    }
+  }
+}

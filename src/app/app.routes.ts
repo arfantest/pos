@@ -40,6 +40,18 @@ export const routes: Routes = [
         path: "settings",
         loadComponent: () => import("./features/settings/settings.component").then((m) => m.SettingsComponent),
       },
+      {
+        path: "expenses",
+        loadComponent: () => import("./expenses/expense-list/expense-list.component").then((m) => m.ExpenseListComponent)
+      },
+      {
+        path: "expenses/new",
+        loadComponent: () => import("./expenses/expense-form/expense-form.component").then((m) => m.ExpenseFormComponent)
+      },
+      {
+        path: "expenses/:id/edit",
+        loadComponent: () => import("./expenses/expense-form/expense-form.component").then((m) => m.ExpenseFormComponent)
+      },
     ],
   },
 ]

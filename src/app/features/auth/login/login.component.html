@@ -1,0 +1,39 @@
+<div class="login-container">
+  <div class="login-form">
+    <div class="login-header">
+      <h1>POS System</h1>
+      <p>Sign in to your account</p>
+    </div>
+    
+    <form nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Please input your username!">
+          <nz-input-group nzPrefixIcon="user">
+            <input type="text" nz-input formControlName="username" placeholder="Username" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      
+      <nz-form-item>
+        <nz-form-control nzErrorTip="Please input your password!">
+          <nz-input-group nzPrefixIcon="lock">
+            <input type="password" nz-input formControlName="password" placeholder="Password" />
+          </nz-input-group>
+        </nz-form-control>
+      </nz-form-item>
+      
+      <button nz-button nzType="primary" nzSize="large" [nzLoading]="loading" 
+              [disabled]="!loginForm.valid" class="login-button">
+        Sign In
+      </button>
+    </form>
+    
+    <nz-divider nzText="Demo Credentials"></nz-divider>
+    
+    <div class="demo-credentials">
+      <p><strong>Admin:</strong> admin / admin123</p>
+      <p><strong>Manager:</strong> manager1 / manager123</p>
+      <p><strong>Cashier:</strong> cashier1 / cashier123</p>
+    </div>
+  </div>
+</div>

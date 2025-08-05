@@ -1,0 +1,171 @@
+<div class="reports-container">
+  <nz-breadcrumb>
+    <nz-breadcrumb-item>
+      <i nz-icon nzType="home"></i>
+    </nz-breadcrumb-item>
+    <nz-breadcrumb-item>Financial Reports</nz-breadcrumb-item>
+  </nz-breadcrumb>
+
+  <div class="page-header">
+    <div class="header-content">
+      <h2>Financial Reports</h2>
+      
+      <form nz-form [formGroup]="dateRangeForm" class="date-range-form">
+        <nz-form-item>
+          <nz-form-control>
+            <nz-range-picker 
+              formControlName="dateRange" 
+              (ngModelChange)="onDateRangeChange()"
+              nzFormat="yyyy-MM-dd">
+            </nz-range-picker>
+          </nz-form-control>
+        </nz-form-item>
+      </form>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading-container">
+    <nz-spin nzSize="large"></nz-spin>
+  </div>
+
+  <div *ngIf="!loading">
+    <nz-tabset [(nzSelectedIndex)]="selectedTabIndex">
+      <!-- Financial Overview -->
+      <nz-tab nzTitle="Financial Overview">
+        <div class="tab-content">
+          <div nz-row [nzGutter]="16" class="summary-cards">
+            <div nz-col nzXs="24" nzSm="12" nzMd="6">
+              <nz-card>
+                <nz-statistic 
+                  nzTitle="Total Revenue" 
+                  [nzValue]="salesReport?.summary?.netSales || 0" 
+                  nzPrefix="$"
+                  [nzValueStyle]="{ color: '#3f8600' }">
+                </nz-statistic>
+                <div class="statistic-suffix">{{ salesReport?.summary?.salesCount || 0 }} sales</div>
+              </nz-card>
+            </div>
+
+            <div nz-col nzXs="24" nzSm="12" nzMd="6">
+              <nz-card>
+                <nz-statistic 
+                  nzTitle="Total Expenses" 
+                  [nzValue]="expenseReport?.summary?.totalExpenses || 0" 
+                  nzPrefix="$"
+                  [nzValueStyle]="{ color: '#cf1322' }">
+                </nz-statistic>
+                <div class="statistic-suffix">{{ expenseReport?.summary?.expenseCount || 0 }} expenses</div>
+              </nz-card>
+            </div>
+
+            <div nz-col nzXs="24" nzSm="12" nzMd="6">
+              <nz-card>
+                <nz-statistic 
+                  nzTitle="Net Profit" 
+                  [nzValue]="profitLossReport?.grossProfit || 0" 
+                  nzPrefix="$"
+                  [nzValueStyle]="{ color: '#1890ff' }">
+                </nz-statistic>
+                <div class="statistic-suffix">{{ (profitLossReport?.grossProfitMargin || 0) | number:'1.1-1' }}% margin</div>
+              </nz-card>
+            </div>
+
+            <div nz-col nzXs="24" nzSm="12" nzMd="6">
+              <nz-card>
+                <nz-statistic 
+                  nzTitle="Total Purchases" 
+                  [nzValue]="purchaseReport?.summary?.netPurchases || 0" 
+                  nzPrefix="$"
+                  [nzValueStyle]="{ color: '#722ed1' }">
+                </nz-statistic>
+                <div class="statistic-suffix">{{ purchaseReport?.summary?.purchaseCount || 0 }} purchases</div>
+              </nz-card>
+            </div>
+          </div>
+
+          <nz-card nzTitle="Profit & Loss Summary" class="chart-card">
+            <app-profit-loss-report [data]="profitLossReport"></app-profit-loss-report>
+          </nz-card>
+        </div>
+      </nz-tab>
+
+      <!-- Account Balances -->
+      <nz-tab nzTitle="Account Balances">
+        <div class="tab-content">
+          <!-- <app-account-balance-report [data]="accountBalanceReport"></app-account-balance-report> -->
+        </div>
+      </nz-tab>
+
+      <!-- Sales Report -->
+      <nz-tab nzTitle="Sales Report">
+        <div class="tab-content">
+          <nz-card nzTitle="Sales Summary">
+            <div class="sales-summary" *ngIf="salesReport">
+              <div nz-row [nzGutter]="16">
+                <div nz-col nzXs="24" nzSm="12" nzMd="6">
+                  <nz-statistic nzTitle="Total Sales" [nzValue]="salesReport.summary.totalSales" nzPrefix="$"></nz-statistic>
+                </div>
+                <div nz-col nzXs="24" nzSm="12" nzMd="6">
+                  <nz-statistic nzTitle="Total Discount" [nzValue]="salesReport.summary.totalDiscount" nzPrefix="$"></nz-statistic>
+                </div>
+                <div nz-col nzXs="24" nzSm="12" nzMd="6">
+                  <nz-statistic nzTitle="Total Tax" [nzValue]="salesReport.summary.totalTax" nzPrefix="$"></nz-statistic>
+                </div>
+                <div nz-col nzXs="24" nzSm="12" nzMd="6">
+                  <nz-statistic 
+                    nzTitle="Net Sales" 
+                    [nzValue]="salesReport.summary.netSales" 
+                    nzPrefix="$"
+                    [nzValueStyle]="{ color: '#3f8600' }">
+                  </nz-statistic>
+                </div>
+              </div>
+            </div>
+          </nz-card>
+        </div>
+      </nz-tab>
+
+      <!-- Expense Report -->
+      <nz-tab nzTitle="Expense Report">
+        <div class="tab-content">
+          <!-- <app-expense-report [data]="expenseReport" [dateRange]="dateRangeForm.value.dateRange"></app-expense-report> -->
+        </div>
+      </nz-tab>
+
+      <!-- Stock Report -->
+      <nz-tab nzTitle="Stock Report">
+        <div class="tab-content">
+          <nz-card nzTitle="Inventory Summary" *ngIf="stockReport">
+            <div nz-row [nzGutter]="16">
+              <div nz-col nzXs="24" nzSm="12" nzMd="6">
+                <nz-statistic nzTitle="Total Products" [nzValue]="stockReport.summary.totalProducts"></nz-statistic>
+              </div>
+              <div nz-col nzXs="24" nzSm="12" nzMd="6">
+                <nz-statistic 
+                  nzTitle="Low Stock Items" 
+                  [nzValue]="stockReport.summary.lowStockCount"
+                  [nzValueStyle]="{ color: '#fa8c16' }">
+                </nz-statistic>
+              </div>
+              <div nz-col nzXs="24" nzSm="12" nzMd="6">
+                <nz-statistic 
+                  nzTitle="Out of Stock" 
+                  [nzValue]="stockReport.summary.outOfStockCount"
+                  [nzValueStyle]="{ color: '#ff4d4f' }">
+                </nz-statistic>
+              </div>
+              <div nz-col nzXs="24" nzSm="12" nzMd="6">
+                <nz-statistic 
+                  nzTitle="Total Stock Value" 
+                  [nzValue]="stockReport.summary.totalStockValue" 
+                  nzPrefix="$"
+                  [nzValueStyle]="{ color: '#52c41a' }">
+                </nz-statistic>
+              </div>
+            </div>
+          </nz-card>
+        </div>
+      </nz-tab>
+    </nz-tabset>
+  </div>
+</div>
