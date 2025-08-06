@@ -24,9 +24,15 @@ import { AuthService } from "../../../core/services/auth.service"
   template: `
     <nz-layout class="min-h-screen">
       <nz-sider nzCollapsible [(nzCollapsed)]="isCollapsed" nzWidth="256px">
-        <div class="logo p-4 text-center text-white font-bold text-lg">
+        <!-- <div class="logo p-4 text-center text-white font-bold text-lg">
+
           POS System
+        </div> -->
+        <div class="logo text-center text-white font-bold " [ngClass]="{ 'p-4 text-lg': !isCollapsed, 'p-2 text-xl': isCollapsed }"> 
+          <span *ngIf="!isCollapsed">POS System</span>
+          <span *ngIf="isCollapsed">POS</span>
         </div>
+
         <ul nz-menu nzTheme="dark" nzMode="inline" [nzInlineCollapsed]="isCollapsed">
           <li nz-menu-item nzMatchRouter>
             <a routerLink="/dashboard">

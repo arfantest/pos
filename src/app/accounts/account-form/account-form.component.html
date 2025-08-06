@@ -42,9 +42,9 @@
             <nz-option *ngFor="let type of accountTypes" [nzLabel]="type.label" [nzValue]="type.value">
             </nz-option>
           </nz-select>
-          <nz-form-explain *ngIf="accountForm.get('type')?.value">
+          <!-- <nz-form-explain *ngIf="accountForm.get('type')?.value">
             {{ accountTypes.find(t => t.value === accountForm.get('type')?.value)?.description }}
-          </nz-form-explain>
+          </nz-form-explain> -->
         </nz-form-control>
       </nz-form-item>
 
@@ -52,7 +52,7 @@
         <nz-form-label [nzSm]="3" [nzXs]="24" nzFor="description">Description</nz-form-label>
         <nz-form-control [nzSm]="21" [nzXs]="24">
           <textarea nz-input formControlName="description" id="description" 
-                    placeholder="Additional details about this account" [nzRows]="3"></textarea>
+                    placeholder="Additional details about this account" row="3"></textarea>
         </nz-form-control>
       </nz-form-item>
 
