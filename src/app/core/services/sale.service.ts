@@ -9,6 +9,7 @@ import { environment } from "../../../environments/environment"
 })
 export class SaleService {
   private apiUrl = `${environment.apiUrl}/sales`
+  private apiUrlReturn = `${environment.apiUrl}/sale-returns`
 
   constructor(private http: HttpClient) {}
 
@@ -34,18 +35,18 @@ export class SaleService {
 
   // Sale Returns
   getSaleReturns(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/returns`)
+    return this.http.get<any[]>(`apiUrlReturn`)
   }
 
   getSaleReturn(id: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/returns/${id}`)
+    return this.http.get<any>(`apiUrlReturn/${id}`)
   }
 
   createSaleReturn(returnData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/returns`, returnData)
+    return this.http.post<any>(`apiUrlReturn`, returnData)
   }
 
   updateSaleReturn(id: string, returnData: Partial<any>): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/returns/${id}`, returnData)
+    return this.http.put<any>(`apiUrlReturn/${id}`, returnData)
   }
 }

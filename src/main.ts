@@ -9,11 +9,19 @@ import { provideHttpClient, withInterceptors } from "@angular/common/http";
 import { AppComponent } from "./app/app";
 import { authInterceptor } from "./app/core/interceptors/auth.interceptor";
 import { appConfig } from "./app/app.config";
+import * as AllIcons from '@ant-design/icons-angular/icons';
 
 // 🔥 i18n for English
 import { NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
 import { registerLocaleData } from '@angular/common';
 import en from '@angular/common/locales/en';
+import { IconDefinition } from "@ant-design/icons-angular";
+import { NZ_ICONS } from "ng-zorro-antd/icon";
+const antDesignIcons = AllIcons as {
+  [key: string]: IconDefinition;
+};
+const icons: IconDefinition[] = Object.keys(antDesignIcons).map(key => antDesignIcons[key])
+
 
 registerLocaleData(en); // ⚠️ Make sure this is called before bootstrap
 
@@ -28,6 +36,7 @@ bootstrapApplication(AppComponent, {
       ReactiveFormsModule
     ),
     provideHttpClient(withInterceptors([authInterceptor])),
+    { provide: NZ_ICONS, useValue: icons },
 
     // ✅ Add this here (inside bootstrapApplication)
     { provide: NZ_I18N, useValue: en_US },

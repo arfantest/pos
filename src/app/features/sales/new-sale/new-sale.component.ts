@@ -12,9 +12,14 @@ import { NzMessageService } from "ng-zorro-antd/message"
 import { NzIconModule } from "ng-zorro-antd/icon"
 import { NzDividerModule } from "ng-zorro-antd/divider"
 import { NzGridModule } from "ng-zorro-antd/grid"
+import { NzInputNumberModule } from "ng-zorro-antd/input-number"
+import { NzTagModule } from "ng-zorro-antd/tag"
+import { NzStatisticModule } from "ng-zorro-antd/statistic"
 import { ProductService } from "../../../core/services/product.service"
 import { SaleService } from "../../../core/services/sale.service"
+import { AccountService } from "../../../core/services/account.service"
 import { Product } from "../../../core/models/product.model"
+import { Account } from "../../../core/models/account.model"
 
 interface CartItem {
   product: Product
@@ -39,312 +44,366 @@ interface CartItem {
     NzIconModule,
     NzDividerModule,
     NzGridModule,
+    NzInputNumberModule,
+    NzTagModule,
+    NzStatisticModule,
   ],
   template: `
-    <div class="new-sale">
-      <h1>New Sale</h1>
-      
-      <div nz-row [nzGutter]="16">
-        <!-- Product Search -->
-        <div nz-col nzXs="24" nzLg="12">
-          <nz-card nzTitle="Product Search" class="search-card">
-            <div class="search-section">
-              <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
-                <input 
-                  type="text" 
-                  nz-input 
-                  placeholder="Search by name, SKU, or barcode..." 
-                  [(ngModel)]="searchText" 
-                  (input)="onSearch()"
-                  (keyup.enter)="onBarcodeSearch()"
-                />
-              </nz-input-group>
-              <ng-template #suffixIconButton>
-                <button nz-button nzType="primary" nzSearch (click)="onBarcodeSearch()">
-                  <span nz-icon nzType="search"></span>
-                </button>
-              </ng-template>
-            </div>
+    <div class="min-h-screen bg-gray-50 p-4">
+      <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="mb-6">
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">New Sale</h1>
+          <p class="text-gray-600">Create a new sale transaction</p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <!-- Left Column - Product Search & Account Info -->
+          <div class="lg:col-span-1 space-y-6">
+            <!-- Account Selection -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <span nz-icon nzType="bank" class="mr-2 text-blue-600"></span>
+                Account Information
+              </h3>
+              
+              <nz-form-item class="mb-4">
+                <nz-form-label class="text-sm font-medium text-gray-700">Select Account</nz-form-label>
+                <nz-form-control>
+                  <nz-select 
+                    [(ngModel)]="selectedAccountId" 
+                    nzPlaceHolder="Choose account"
+                    (ngModelChange)="onAccountChange()"
+                    class="w-full"
+                  >
+                    <nz-option 
+                      *ngFor="let account of accounts" 
+                      [nzValue]="account.id" 
+                      [nzLabel]="account.name"
+                    >
+                      <div class="flex justify-between items-center">
+                        <span>{{ account.name }}</span>
+                        <nz-tag [nzColor]="getAccountStatusColor(account.balance)">
+                          {{ account.balance | number:'1.2-2' }}
+                        </nz-tag>
+                      </div>
+                    </nz-option>
+                  </nz-select>
+                </nz-form-control>
+              </nz-form-item>
 
-            <div class="product-list" *ngIf="filteredProducts.length > 0">
-              <div 
-                class="product-item" 
-                *ngFor="let product of filteredProducts.slice(0, 10)"
-                (click)="addToCart(product)"
-              >
-                <div class="product-info">
-                  <div class="product-name">{{ product.name }}</div>
-                  <div class="product-details">{{ product.sku }} | Stock: {{ product.stock }}</div>
-                  <div class="product-price">\${{ product.price | number:'1.2-2' }}</div>
+              <!-- Account Status Display -->
+              <div *ngIf="selectedAccount" class="bg-gray-50 rounded-lg p-4">
+                <div class="grid grid-cols-2 gap-4">
+                  <nz-statistic 
+                    nzTitle="Account Balance" 
+                    [nzValue]="selectedAccount.balance" 
+                    nzPrefix="$"
+                    [nzValueStyle]="{ color: selectedAccount.balance >= 0 ? '#3f8600' : '#cf1322' }"
+                  ></nz-statistic>
+                  <nz-statistic 
+                    nzTitle="Account Type" 
+                    [nzValue]="selectedAccount.type | titlecase"
+                  ></nz-statistic>
                 </div>
-                <button nz-button nzType="primary" nzSize="small">
-                  <span nz-icon nzType="plus"></span>
-                </button>
+                <div class="mt-3">
+                  <span class="text-sm text-gray-600">Status: </span>
+                  <nz-tag [nzColor]="selectedAccount.isActive ? 'green' : 'red'">
+                    {{ selectedAccount.isActive ? 'Active' : 'Inactive' }}
+                  </nz-tag>
+                </div>
               </div>
             </div>
-          </nz-card>
-        </div>
 
-        <!-- Customer & Sale Info -->
-        <div nz-col nzXs="24" nzLg="12">
-          <nz-card nzTitle="Sale Information">
-            <form nz-form [formGroup]="saleForm">
-              <nz-form-item>
-                <nz-form-label [nzSpan]="8">Customer Name</nz-form-label>
-                <nz-form-control [nzSpan]="16">
-                  <input nz-input formControlName="customerName" placeholder="Walk-in Customer" />
-                </nz-form-control>
-              </nz-form-item>
-
-              <nz-form-item>
-                <nz-form-label [nzSpan]="8">Customer Phone</nz-form-label>
-                <nz-form-control [nzSpan]="16">
-                  <input nz-input formControlName="customerPhone" placeholder="Phone Number" />
-                </nz-form-control>
-              </nz-form-item>
-
-              <nz-form-item>
-                <nz-form-label [nzSpan]="8">Discount (%)</nz-form-label>
-                <nz-form-control [nzSpan]="16">
+            <!-- Product Search -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <span nz-icon nzType="search" class="mr-2 text-green-600"></span>
+                Product Search
+              </h3>
+              
+              <div class="space-y-4">
+                <nz-input-group nzSearch [nzAddOnAfter]="suffixIconButton">
                   <input 
+                    type="text" 
                     nz-input 
-                    type="number" 
-                    formControlName="discount" 
-                    min="0" 
-                    max="100" 
-                    (input)="calculateTotals()"
+                    placeholder="Search by name, SKU, or barcode..." 
+                    [(ngModel)]="searchText" 
+                    (input)="onSearch()"
+                    (keyup.enter)="onBarcodeSearch()"
+                    class="rounded-md"
                   />
-                </nz-form-control>
-              </nz-form-item>
+                </nz-input-group>
+                <ng-template #suffixIconButton>
+                  <button nz-button nzType="primary" nzSearch (click)="onBarcodeSearch()" class="rounded-md">
+                    <span nz-icon nzType="search"></span>
+                  </button>
+                </ng-template>
 
-              <nz-form-item>
-                <nz-form-label [nzSpan]="8">Tax (%)</nz-form-label>
-                <nz-form-control [nzSpan]="16">
-                  <input 
-                    nz-input 
-                    type="number" 
-                    formControlName="tax" 
-                    min="0" 
-                    (input)="calculateTotals()"
-                  />
-                </nz-form-control>
-              </nz-form-item>
-            </form>
-          </nz-card>
+                <!-- Product List -->
+                <div class="max-h-96 overflow-y-auto space-y-2" *ngIf="filteredProducts.length > 0">
+                  <div 
+                    *ngFor="let product of filteredProducts.slice(0, 10)"
+                    class="border border-gray-200 rounded-lg p-3 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white"
+                    (click)="addToCart(product)"
+                  >
+                    <div class="flex justify-between items-start">
+                      <div class="flex-1">
+                        <h4 class="font-medium text-gray-900 text-sm">{{ product.name }}</h4>
+                        <p class="text-xs text-gray-500 mt-1">{{ product.sku }} | Stock: {{ product.stock }}</p>
+                        <p class="text-sm font-semibold text-blue-600 mt-1">{{ product.price | number:'1.2-2' }}</p>
+                      </div>
+                      <button nz-button nzType="primary" nzSize="small" class="rounded-md">
+                        <span nz-icon nzType="plus"></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="searchText && filteredProducts.length === 0" class="text-center py-8 text-gray-500">
+                  <span nz-icon nzType="inbox" class="text-2xl block mb-2"></span>
+                  No products found
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right Column - Cart & Sale Info -->
+          <div class="lg:col-span-2 space-y-6">
+            <!-- Customer Information -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <span nz-icon nzType="user" class="mr-2 text-purple-600"></span>
+                Customer Information
+              </h3>
+              
+              <form nz-form [formGroup]="saleForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <nz-form-item>
+                  <nz-form-label class="text-sm font-medium text-gray-700">Customer Name</nz-form-label>
+                  <nz-form-control>
+                    <input nz-input formControlName="customerName" placeholder="Walk-in Customer" class="rounded-md" />
+                  </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                  <nz-form-label class="text-sm font-medium text-gray-700">Phone Number</nz-form-label>
+                  <nz-form-control>
+                    <input nz-input formControlName="customerPhone" placeholder="Phone Number" class="rounded-md" />
+                  </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                  <nz-form-label class="text-sm font-medium text-gray-700">Discount (%)</nz-form-label>
+                  <nz-form-control>
+                    <nz-input-number 
+                      formControlName="discount" 
+                      [nzMin]="0" 
+                      [nzMax]="100" 
+                      [nzStep]="0.1"
+                      (ngModelChange)="calculateTotals()"
+                      class="w-full rounded-md"
+                    ></nz-input-number>
+                  </nz-form-control>
+                </nz-form-item>
+
+                <nz-form-item>
+                  <nz-form-label class="text-sm font-medium text-gray-700">Tax (%)</nz-form-label>
+                  <nz-form-control>
+                    <nz-input-number 
+                      formControlName="tax" 
+                      [nzMin]="0" 
+                      [nzStep]="0.1"
+                      (ngModelChange)="calculateTotals()"
+                      class="w-full rounded-md"
+                    ></nz-input-number>
+                  </nz-form-control>
+                </nz-form-item>
+              </form>
+            </div>
+
+            <!-- Shopping Cart -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center justify-between">
+                <span class="flex items-center">
+                  <span nz-icon nzType="shopping-cart" class="mr-2 text-orange-600"></span>
+                  Shopping Cart ({{ cart.length }} items)
+                </span>
+                <button 
+                  nz-button 
+                  nzType="default" 
+                  nzSize="small" 
+                  (click)="clearCart()" 
+                  *ngIf="cart.length > 0"
+                  class="rounded-md"
+                >
+                  <span nz-icon nzType="delete"></span>
+                  Clear Cart
+                </button>
+              </h3>
+
+              <!-- Empty Cart State -->
+              <div *ngIf="cart.length === 0" class="text-center py-12 text-gray-500">
+                <span nz-icon nzType="shopping-cart" class="text-4xl block mb-4 text-gray-300"></span>
+                <p class="text-lg">Your cart is empty</p>
+                <p class="text-sm">Search and add products to get started</p>
+              </div>
+
+              <!-- Cart Items -->
+              <div *ngIf="cart.length > 0" class="space-y-4">
+                <div 
+                  *ngFor="let item of cart; let i = index" 
+                  class="border border-gray-200 rounded-lg p-4 bg-gray-50"
+                >
+                  <div class="flex justify-between items-start">
+                    <div class="flex-1">
+                      <h4 class="font-medium text-gray-900">{{ item.product.name }}</h4>
+                      <p class="text-sm text-gray-500">{{ item.product.sku }}</p>
+                      <p class="text-sm font-semibold text-blue-600">{{ item.unitPrice | number:'1.2-2' }} each</p>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                      <div class="flex flex-col items-end">
+                        <label class="text-xs text-gray-500 mb-1">Quantity</label>
+                        <nz-input-number 
+                          [(ngModel)]="item.quantity" 
+                          [nzMin]="1" 
+                          [nzMax]="item.product.stock"
+                          (ngModelChange)="updateCartItem(i)"
+                          class="w-20"
+                        ></nz-input-number>
+                      </div>
+                      
+                      <div class="flex flex-col items-end">
+                        <label class="text-xs text-gray-500 mb-1">Total</label>
+                        <span class="text-lg font-bold text-green-600">{{ item.total | number:'1.2-2' }}</span>
+                      </div>
+                      
+                      <button 
+                        nz-button 
+                        nzType="text" 
+                        nzDanger 
+                        (click)="removeFromCart(i)"
+                        class="rounded-md"
+                      >
+                        <span nz-icon nzType="delete"></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Totals Section -->
+                <div class="border-t border-gray-200 pt-4 mt-6">
+                  <div class="bg-gray-50 rounded-lg p-4 space-y-3">
+                    <div class="flex justify-between text-sm">
+                      <span class="text-gray-600">Subtotal:</span>
+                      <span class="font-medium">{{ subtotal | number:'1.2-2' }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between text-sm" *ngIf="discountAmount > 0">
+                      <span class="text-gray-600">Discount ({{ saleForm.value.discount }}%):</span>
+                      <span class="font-medium text-red-600">-{{ discountAmount | number:'1.2-2' }}</span>
+                    </div>
+                    
+                    <div class="flex justify-between text-sm">
+                      <span class="text-gray-600">Tax ({{ saleForm.value.tax }}%):</span>
+                      <span class="font-medium">{{ taxAmount | number:'1.2-2' }}</span>
+                    </div>
+                    
+                    <div class="border-t border-gray-300 pt-3">
+                      <div class="flex justify-between text-lg font-bold">
+                        <span>Total:</span>
+                        <span class="text-green-600">{{ total | number:'1.2-2' }}</span>
+                      </div>
+                    </div>
+
+                    <!-- Payment Section -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-300">
+                      <nz-form-item class="mb-0">
+                        <nz-form-label class="text-sm font-medium text-gray-700">Amount Paid</nz-form-label>
+                        <nz-form-control>
+                          <nz-input-number 
+                            [(ngModel)]="paid" 
+                            [nzMin]="0" 
+                            [nzStep]="0.01"
+                            (ngModelChange)="calculateChange()"
+                            class="w-full rounded-md"
+                            nzPlaceHolder="0.00"
+                          ></nz-input-number>
+                        </nz-form-control>
+                      </nz-form-item>
+
+                      <div class="flex flex-col justify-end">
+                        <label class="text-sm font-medium text-gray-700 mb-1">Change:</label>
+                        <div class="text-lg font-bold" [class]="change >= 0 ? 'text-green-600' : 'text-red-600'">
+                          {{ change | number:'1.2-2' }}
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-end space-x-3 pt-4">
+                      <button 
+                        nz-button 
+                        nzType="default" 
+                        (click)="clearCart()"
+                        class="rounded-md"
+                      >
+                        Clear Cart
+                      </button>
+                      <button 
+                        nz-button 
+                        nzType="primary" 
+                        nzSize="large"
+                        [nzLoading]="processing"
+                        [disabled]="!canCompleteSale()"
+                        (click)="completeSale()"
+                        class="rounded-md px-8"
+                      >
+                        <span nz-icon nzType="check-circle" class="mr-1"></span>
+                        Complete Sale
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <!-- Shopping Cart -->
-      <nz-card nzTitle="Shopping Cart" class="cart-card">
-        <div *ngIf="cart.length === 0" class="empty-cart">
-          <span nz-icon nzType="shopping-cart" class="empty-icon"></span>
-          <p>No items in cart. Search and add products above.</p>
-        </div>
-
-        <nz-table #cartTable [nzData]="cart" [nzShowPagination]="false" *ngIf="cart.length > 0">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>SKU</th>
-              <th>Price</th>
-              <th>Quantity</th>
-              <th>Total</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of cartTable.data; let i = index">
-              <td>{{ item.product.name }}</td>
-              <td>{{ item.product.sku }}</td>
-              <td>\${{ item.unitPrice | number:'1.2-2' }}</td>
-              <td>
-                <input 
-                  nz-input 
-                  type="number" 
-                  [(ngModel)]="item.quantity" 
-                  min="1" 
-                  [max]="item.product.stock"
-                  (input)="updateCartItem(i)"
-                  style="width: 80px;"
-                />
-              </td>
-              <td>\${{ item.total | number:'1.2-2' }}</td>
-              <td>
-                <button nz-button nzType="link" nzSize="small" (click)="removeFromCart(i)">
-                  <span nz-icon nzType="delete" class="text-danger"></span>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </nz-table>
-
-        <nz-divider></nz-divider>
-
-        <!-- Totals -->
-        <div class="totals-section" *ngIf="cart.length > 0">
-          <div class="total-row">
-            <span>Subtotal:</span>
-            <span>\${{ subtotal | number:'1.2-2' }}</span>
-          </div>
-          <div class="total-row" *ngIf="discountAmount > 0">
-            <span>Discount ({{ saleForm.value.discount }}%):</span>
-            <span class="discount">-\${{ discountAmount | number:'1.2-2' }}</span>
-          </div>
-          <div class="total-row">
-            <span>Tax ({{ saleForm.value.tax }}%):</span>
-            <span>\${{ taxAmount | number:'1.2-2' }}</span>
-          </div>
-          <div class="total-row total-final">
-            <span><strong>Total:</strong></span>
-            <span><strong>\${{ total | number:'1.2-2' }}</strong></span>
-          </div>
-
-          <nz-form-item>
-            <nz-form-label [nzSpan]="8" nzRequired>Amount Paid</nz-form-label>
-            <nz-form-control [nzSpan]="16">
-              <input 
-                nz-input 
-                type="number" 
-                formControlName="paid" 
-                step="0.01"
-                min="0"
-                (input)="calculateChange()"
-              />
-            </nz-form-control>
-          </nz-form-item>
-
-          <div class="total-row" *ngIf="change >= 0">
-            <span>Change:</span>
-            <span>\${{ change | number:'1.2-2' }}</span>
-          </div>
-
-          <div class="action-buttons">
-            <button nz-button (click)="clearCart()">Clear Cart</button>
-            <button 
-              nz-button 
-              nzType="primary" 
-              [nzLoading]="processing"
-              [disabled]="cart.length === 0 || saleForm.value.paid < total"
-              (click)="completeSale()"
-            >
-              Complete Sale
-            </button>
-          </div>
-        </div>
-      </nz-card>
     </div>
   `,
   styles: [
     `
-    .new-sale {
-      padding: 0;
-    }
-
-    h1 {
-      margin-bottom: 24px;
-      color: #262626;
-    }
-
-    .search-card {
-      height: 500px;
-    }
-
-    .search-section {
-      margin-bottom: 16px;
-    }
-
-    .product-list {
-      max-height: 350px;
-      overflow-y: auto;
-    }
-
-    .product-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px;
-      border: 1px solid #f0f0f0;
-      border-radius: 6px;
-      margin-bottom: 8px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .product-item:hover {
-      border-color: #1890ff;
-      box-shadow: 0 2px 8px rgba(24, 144, 255, 0.2);
-    }
-
-    .product-info {
-      flex: 1;
-    }
-
-    .product-name {
-      font-weight: 500;
-      margin-bottom: 4px;
-    }
-
-    .product-details {
-      font-size: 12px;
-      color: #666;
-      margin-bottom: 4px;
-    }
-
-    .product-price {
-      font-weight: 600;
-      color: #1890ff;
-    }
-
-    .cart-card {
-      margin-top: 24px;
-    }
-
-    .empty-cart {
-      text-align: center;
-      padding: 40px;
-      color: #999;
-    }
-
-    .empty-icon {
-      font-size: 48px;
-      margin-bottom: 16px;
+    :host {
       display: block;
     }
 
-    .totals-section {
-      max-width: 400px;
-      margin-left: auto;
+    .ant-statistic-content {
+      font-size: 18px;
     }
 
-    .total-row {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      padding: 4px 0;
+    .ant-input-number {
+      width: 100%;
     }
 
-    .total-final {
-      border-top: 2px solid #f0f0f0;
-      padding-top: 12px;
-      margin-top: 12px;
-      font-size: 16px;
+    nz-form-item {
+      margin-bottom: 16px;
     }
 
-    .discount {
-      color: #52c41a;
+    .ant-card {
+      border-radius: 8px;
     }
 
-    .action-buttons {
-      margin-top: 24px;
-      text-align: right;
+    .ant-btn {
+      border-radius: 6px;
     }
 
-    .action-buttons button {
-      margin-left: 8px;
+    .ant-input {
+      border-radius: 6px;
     }
 
-    .text-danger {
-      color: #ff4d4f;
+    .ant-select {
+      border-radius: 6px;
     }
   `,
   ],
@@ -352,6 +411,9 @@ interface CartItem {
 export class NewSaleComponent implements OnInit {
   products: Product[] = []
   filteredProducts: Product[] = []
+  accounts: Account[] = []
+  selectedAccount: Account | null = null
+  selectedAccountId: string = ""
   cart: CartItem[] = []
   searchText = ""
   processing = false
@@ -362,12 +424,13 @@ export class NewSaleComponent implements OnInit {
   taxAmount = 0
   total = 0
   change = 0
-
+  paid = 0;
   saleForm: FormGroup
 
   constructor(
     private productService: ProductService,
     private saleService: SaleService,
+    private accountService: AccountService,
     private fb: FormBuilder,
     private message: NzMessageService,
     private router: Router,
@@ -383,6 +446,7 @@ export class NewSaleComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProducts()
+    this.loadAccounts()
     this.calculateTotals()
   }
 
@@ -393,9 +457,32 @@ export class NewSaleComponent implements OnInit {
         this.filteredProducts = []
       },
       error: (error) => {
+        console.error('Error loading products:', error)
         this.message.error("Failed to load products")
       },
     })
+  }
+
+  loadAccounts(): void {
+    this.accountService.getAccounts().subscribe({
+      next: (accounts) => {
+        this.accounts = accounts.filter(a => a.isActive)
+      },
+      error: (error) => {
+        console.error('Error loading accounts:', error)
+        this.message.error("Failed to load accounts")
+      },
+    })
+  }
+
+  onAccountChange(): void {
+    this.selectedAccount = this.accounts.find(a => a.id === this.selectedAccountId) || null
+  }
+
+  getAccountStatusColor(balance: number): string {
+    if (balance > 1000) return 'green'
+    if (balance > 0) return 'orange'
+    return 'red'
   }
 
   onSearch(): void {
@@ -404,11 +491,12 @@ export class NewSaleComponent implements OnInit {
       return
     }
 
+    const searchTerm = this.searchText.toLowerCase()
     this.filteredProducts = this.products.filter(
       (product) =>
-        product.name.toLowerCase().includes(this.searchText.toLowerCase()) ||
-        product.sku.toLowerCase().includes(this.searchText.toLowerCase()) ||
-        product.barcode?.toLowerCase().includes(this.searchText.toLowerCase()),
+        product.name.toLowerCase().includes(searchTerm) ||
+        product.sku.toLowerCase().includes(searchTerm) ||
+        product.barcode?.toLowerCase().includes(searchTerm),
     )
   }
 
@@ -437,6 +525,7 @@ export class NewSaleComponent implements OnInit {
       if (existingItem.quantity < product.stock) {
         existingItem.quantity++
         this.updateCartItem(existingIndex)
+        this.message.success(`Added another ${product.name} to cart`)
       } else {
         this.message.warning("Cannot add more items. Stock limit reached.")
       }
@@ -450,6 +539,7 @@ export class NewSaleComponent implements OnInit {
       }
       this.cart.push(cartItem)
       this.calculateTotals()
+      this.message.success(`${product.name} added to cart`)
     }
 
     this.searchText = ""
@@ -471,42 +561,50 @@ export class NewSaleComponent implements OnInit {
   }
 
   removeFromCart(index: number): void {
+    const item = this.cart[index]
     this.cart.splice(index, 1)
     this.calculateTotals()
+    this.message.info(`${item.product.name} removed from cart`)
   }
 
   clearCart(): void {
     this.cart = []
     this.calculateTotals()
+    this.message.info("Cart cleared")
   }
 
   calculateTotals(): void {
     this.subtotal = this.cart.reduce((sum, item) => sum + item.total, 0)
-    this.discountAmount = (this.subtotal * this.saleForm.value.discount) / 100
-    this.taxAmount = ((this.subtotal - this.discountAmount) * this.saleForm.value.tax) / 100
+    this.discountAmount = (this.subtotal * (this.saleForm.value.discount || 0)) / 100
+    this.taxAmount = ((this.subtotal - this.discountAmount) * (this.saleForm.value.tax || 0)) / 100
     this.total = this.subtotal - this.discountAmount + this.taxAmount
     this.calculateChange()
   }
 
   calculateChange(): void {
+    this.saleForm.value.paid = this.paid;
     const paid = this.saleForm.value.paid || 0
     this.change = paid - this.total
   }
 
-  completeSale(): void {
-    if (this.cart.length === 0) {
-      this.message.error("Cart is empty")
-      return
-    }
+  canCompleteSale(): boolean {
+    return (
+      this.cart.length > 0 &&
+      this.saleForm.value.paid >= this.total &&
+      !!this.selectedAccountId &&
+      !this.processing
+    );
+  }
 
-    if (this.saleForm.value.paid < this.total) {
-      this.message.error("Insufficient payment amount")
+  completeSale(): void {
+    if (!this.canCompleteSale()) {
+      this.message.error("Please check all requirements before completing the sale")
       return
     }
 
     this.processing = true
 
-    const saleItems: any[] = this.cart.map((item) => ({
+    const saleItems = this.cart.map((item) => ({
       productId: item.product.id,
       quantity: item.quantity,
       unitPrice: item.unitPrice,
@@ -519,15 +617,19 @@ export class NewSaleComponent implements OnInit {
       paid: this.saleForm.value.paid,
       customerName: this.saleForm.value.customerName || undefined,
       customerPhone: this.saleForm.value.customerPhone || undefined,
+      accountId: this.selectedAccountId,
     }
+
+    console.log('Submitting sale data:', saleData)
 
     this.saleService.createSale(saleData).subscribe({
       next: (sale) => {
-        this.message.success(`Sale completed! Invoice: ${sale.invoiceNumber}`)
+        this.message.success(`Sale completed successfully! Invoice: ${sale.invoiceNumber}`)
         this.router.navigate(["/sales"])
       },
       error: (error) => {
-        this.message.error("Failed to complete sale")
+        console.error('Sale creation error:', error)
+        this.message.error(error.error?.message || "Failed to complete sale")
         this.processing = false
       },
     })
