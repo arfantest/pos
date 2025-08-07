@@ -52,6 +52,10 @@ export const routes: Routes = [
         path: "expenses/:id/edit",
         loadComponent: () => import("./expenses/expense-form/expense-form.component").then((m) => m.ExpenseFormComponent)
       },
+      {
+        path: "reportss",
+        loadComponent: () => import("./accounting/reports/reports").then((m) => m.JournalEntriesTableComponent)
+      },
     ],
   },
 ]

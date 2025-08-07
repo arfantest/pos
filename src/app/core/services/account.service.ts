@@ -39,4 +39,7 @@ export class AccountService {
     }
     return this.http.get<any[]>(`${environment.apiUrl}/ledger/account/${accountId}${params}`)
   }
+  getJournalEntries(params:any): Observable<any> {
+    return this.http.get<any>(`${environment.apiUrl}/accounting/journal-entries`,{ params })
+  }
 }

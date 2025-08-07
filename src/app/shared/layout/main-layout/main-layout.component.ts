@@ -111,6 +111,13 @@ import { AuthService } from "../../../core/services/auth.service"
               <span>Settings</span>
             </a>
           </li>
+          <li nz-menu-item nzMatchRouter>
+            <a routerLink="reportss">
+              <i nz-icon nzType="reports"></i>
+              <span>reports</span>
+            </a>
+          </li>
+
         </ul>
       </nz-sider>
       <nz-layout>
