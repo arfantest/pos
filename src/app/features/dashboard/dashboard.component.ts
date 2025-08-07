@@ -19,6 +19,7 @@ import { Product } from "../../core/models/product.model"
 import { Sale } from "../../core/models/sale.model"
 import { forkJoin } from "rxjs"
 import { startOfWeek, startOfMonth, format, subDays } from "date-fns"
+import { ParseNumberPipe } from "../../pipe"
 
 Chart.register(...registerables)
 
@@ -54,6 +55,7 @@ interface SalesChartData {
     NzButtonModule,
     FormsModule,
     BaseChartDirective,
+    ParseNumberPipe,
   ],
   template: `
     <div class="min-h-screen bg-gray-50 p-6">
@@ -85,7 +87,7 @@ interface SalesChartData {
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600">Today's Sales</p>
-                <p class="text-2xl font-bold text-gray-900">\${{ stats.todaySales | number:'1.2-2' }}</p>
+                <p class="text-2xl font-bold text-gray-900">\${{ stats.todaySales | parseNumber:'1.2-2' }}</p>
                 <p class="text-xs text-green-600 mt-1">
                   <span nz-icon nzType="arrow-up"></span>
                   +12% from yesterday
@@ -102,7 +104,7 @@ interface SalesChartData {
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600">Weekly Sales</p>
-                <p class="text-2xl font-bold text-gray-900">\${{ stats.weeklySales | number:'1.2-2' }}</p>
+                <p class="text-2xl font-bold text-gray-900">\${{ stats.weeklySales | parseNumber:'1.2-2' }}</p>
                 <p class="text-xs text-green-600 mt-1">
                   <span nz-icon nzType="arrow-up"></span>
                   +8% from last week
@@ -119,7 +121,7 @@ interface SalesChartData {
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-medium text-gray-600">Monthly Sales</p>
-                <p class="text-2xl font-bold text-gray-900">\${{ stats.monthlySales | number:'1.2-2' }}</p>
+                <p class="text-2xl font-bold text-gray-900">\${{ stats.monthlySales | parseNumber:'1.2-2' }}</p>
                 <p class="text-xs text-green-600 mt-1">
                   <span nz-icon nzType="arrow-up"></span>
                   +15% from last month
@@ -206,7 +208,7 @@ interface SalesChartData {
                   <tr *ngFor="let sale of recentSalesTable.data">
                     <td class="font-medium">{{ sale.invoiceNumber }}</td>
                     <td>{{ sale.customerName || 'Walk-in' }}</td>
-                    <td class="text-right font-semibold">\${{ sale.total | number:'1.2-2' }}</td>
+                    <td class="text-right font-semibold">\${{ sale.total | parseNumber:'1.2-2' }}</td>
                     <td class="text-center">
                       <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                             [ngClass]="{
