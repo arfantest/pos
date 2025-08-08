@@ -56,6 +56,14 @@ export const routes: Routes = [
         path: "reportss",
         loadComponent: () => import("./accounting/reports/reports").then((m) => m.JournalEntriesTableComponent)
       },
+      {
+        path: "account-form",
+        loadComponent: () => import("./accounts/account-form/account-form.component").then((m) => m.AccountFormComponent)
+      },
+      {
+        path: "account-list",
+        loadComponent: () => import("./accounts/account-list/account-list.component").then((m) => m.AccountListComponent)
+      },
     ],
   },
 ]

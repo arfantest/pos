@@ -98,21 +98,21 @@ export class AccountListComponent implements OnInit {
   }
 
   getAccountTypeColor(type: AccountType): string {
-    switch (type) {
-      case AccountType.ASSET:
-        return "blue"
-      case AccountType.LIABILITY:
-        return "red"
-      case AccountType.EQUITY:
-        return "purple"
-      case AccountType.INCOME:
-        return "green"
-      case AccountType.EXPENSE:
-        return "orange"
-      default:
-        return "default"
-    }
+  switch (type) {
+    case AccountType.ASSET:
+      return "blue";
+    case AccountType.LIABILITY:
+      return "red";
+    case AccountType.EQUITY:
+      return "purple";
+    case AccountType.INCOME:
+      return "green";
+    case AccountType.EXPENSE:
+      return "orange";
+    default:
+      return "default";
   }
+}
 
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat("en-US", {
