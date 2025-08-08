@@ -63,11 +63,16 @@ export class NewSaleComponent implements OnInit {
   searchText = "";
   processing = false;
 
-  // Discount settings
-  discountType: 'percentage' | 'amount' = 'percentage';
-  discountInput: number = 0;
+  // Separate discount inputs
+  discountAmountInput: number = 0;
+  discountPercentageInput: number = 0;
+  
+  // Calculated values
   discountAmount: number = 0;
   discountPercentage: number = 0;
+  
+  // Flag to prevent circular updates
+  private isUpdatingDiscount = false;
 
   // Calculations
   taxRate: number = 0; // Example tax rate 
@@ -94,55 +99,6 @@ export class NewSaleComponent implements OnInit {
       tax: [0, [Validators.min(0)]],
       paid: [0, [Validators.min(0)]],
     });
-  }
-
-  //  discount work 
-  private discountChangeTimeout: any;
-
-  handleRealTimeDiscountChange(event: Event): void {
-    const inputElement = event.target as HTMLInputElement;
-    const rawValue = inputElement.value;
-
-    if (this.discountChangeTimeout) {
-      clearTimeout(this.discountChangeTimeout);
-    }
-
-    this.discountInput = rawValue === '' ? 0 : Number(rawValue);
-
-    this.discountChangeTimeout = setTimeout(() => {
-      this.calculateDiscount();
-      this.discountChangeTimeout = null;
-    }, 30); // 300ms delay
-  }
-  finalizeDiscountCalculation(): void {
-    if (this.discountChangeTimeout) {
-      clearTimeout(this.discountChangeTimeout);
-      this.calculateDiscount();
-    }
-  }
-  handleArrowChange(): void {
-    if (this.discountChangeTimeout) {
-      clearTimeout(this.discountChangeTimeout);
-    }
-    this.calculateDiscount();
-  }
-  calculateDiscount(): void {
-    if (isNaN(this.discountInput)) {
-      this.discountInput = 0;
-    }
-
-    if (this.discountType === 'percentage') {
-      this.discountInput = Math.min(100, Math.max(0, this.discountInput));
-      this.discountPercentage = this.discountInput;
-      this.discountAmount = (this.subtotal * this.discountPercentage) / 100;
-    } else {
-      this.discountInput = Math.min(this.subtotal, Math.max(0, this.discountInput));
-      this.discountAmount = this.discountInput;
-      this.discountPercentage = this.subtotal > 0 ? (this.discountAmount / this.subtotal) * 100 : 0;
-    }
-
-    // Update totals
-    this.calculateTotals();
   }
 
   ngOnInit(): void {
@@ -185,12 +141,58 @@ export class NewSaleComponent implements OnInit {
     return 'red';
   }
 
-  onDiscountTypeChange(): void {
-    // Reset discount values when type changes
-    this.discountInput = 0;
+  // Discount handling methods
+  onDiscountAmountChange(): void {
+    if (this.isUpdatingDiscount) return;
+    
+    this.isUpdatingDiscount = true;
+    
+    // Ensure the amount doesn't exceed subtotal
+    this.discountAmountInput = Math.min(this.subtotal, Math.max(0, this.discountAmountInput || 0));
+    
+    // Set the actual discount amount
+    this.discountAmount = this.discountAmountInput;
+    
+    // Calculate and update percentage
+    this.discountPercentage = this.subtotal > 0 ? (this.discountAmount / this.subtotal) * 100 : 0;
+    this.discountPercentageInput = Math.round(this.discountPercentage * 10) / 10; // Round to 1 decimal
+    
+    this.calculateTotals();
+    this.isUpdatingDiscount = false;
+  }
+
+  onDiscountPercentageChange(): void {
+    if (this.isUpdatingDiscount) return;
+    
+    this.isUpdatingDiscount = true;
+    
+    // Ensure percentage is between 0 and 100
+    this.discountPercentageInput = Math.min(100, Math.max(0, this.discountPercentageInput || 0));
+    
+    // Set the actual discount percentage
+    this.discountPercentage = this.discountPercentageInput;
+    
+    // Calculate and update amount
+    this.discountAmount = (this.subtotal * this.discountPercentage) / 100;
+    this.discountAmountInput = Math.round(this.discountAmount * 100) / 100; // Round to 2 decimals
+    
+    this.calculateTotals();
+    this.isUpdatingDiscount = false;
+  }
+
+  setQuickDiscount(percentage: number): void {
+    this.discountPercentageInput = percentage;
+    this.onDiscountPercentageChange();
+  }
+
+  clearDiscount(): void {
+    this.isUpdatingDiscount = true;
+    this.discountAmountInput = 0;
+    this.discountPercentageInput = 0;
     this.discountAmount = 0;
     this.discountPercentage = 0;
     this.calculateTotals();
+    this.isUpdatingDiscount = false;
   }
 
   onSearch(): void {
@@ -265,12 +267,9 @@ export class NewSaleComponent implements OnInit {
     this.calculateTotals();
   }
 
-
   clearCart(): void {
     this.cart = [];
-    this.discountInput = 0;
-    this.discountAmount = 0;
-    this.discountPercentage = 0;
+    this.clearDiscount();
     this.paid = 0;
     this.change = 0;
     this.message.info("Cart cleared");
@@ -278,19 +277,27 @@ export class NewSaleComponent implements OnInit {
   }
 
   calculateTotals(): void {
+    // Calculate subtotal
     this.subtotal = this.cart.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
 
-    if (this.discountType === 'amount') {
-      this.discountAmount = Math.min(this.subtotal, this.discountInput);
-      this.discountPercentage = this.subtotal > 0 ? (this.discountAmount / this.subtotal) * 100 : 0;
+    // If discount amount exceeds subtotal, adjust it
+    if (this.discountAmount > this.subtotal) {
+      this.discountAmount = this.subtotal;
+      this.discountAmountInput = this.discountAmount;
+      this.discountPercentage = 100;
+      this.discountPercentageInput = 100;
     }
 
+    // Calculate amount after discount
     const amountAfterDiscount = Math.max(0, this.subtotal - this.discountAmount);
 
+    // Calculate tax on discounted amount
     this.taxAmount = amountAfterDiscount * (this.taxRate / 100);
 
+    // Calculate final total
     this.total = amountAfterDiscount + this.taxAmount;
 
+    // Calculate remaining balance and change
     this.remainingTotal = Math.max(0, this.total - (this.paid || 0));
     this.change = Math.max(0, (this.paid || 0) - this.total);
   }

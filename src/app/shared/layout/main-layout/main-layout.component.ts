@@ -108,13 +108,12 @@ import { AuthService } from "../../../core/services/auth.service"
 
 
           <li nz-submenu nzTitle="Accounts" nzIcon="account-book">
-
             <ul>
-              <li nz-menu-item nzMatchRouter>
-                <a routerLink="/account-form">account Form</a>
+             <li nz-menu-item nzMatchRouter>
+                <a routerLink="/accounts">Account List</a>
               </li>
               <li nz-menu-item nzMatchRouter>
-                <a routerLink="/account-list">account List</a>
+                <a routerLink="/accounts/new">Account Form</a>
               </li>
             </ul>
           </li>

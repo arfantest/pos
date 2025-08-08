@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core"
-import { Router } from "@angular/router"
+import { Router, RouterModule } from "@angular/router"
 import { NzMessageService } from "ng-zorro-antd/message"
 import { AccountService } from "../../core/services/account.service"
 import { Account, AccountType } from "../../core/models/account.model"
@@ -14,6 +14,7 @@ import { NzGridModule } from "ng-zorro-antd/grid"
 import { NzBreadCrumbModule } from "ng-zorro-antd/breadcrumb"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
 import { CommonModule } from "@angular/common"
+import { NzIconModule } from "ng-zorro-antd/icon"
 
 @Component({
   selector: "app-account-list",
@@ -31,6 +32,8 @@ import { CommonModule } from "@angular/common"
     NzStatisticModule,
     NzGridModule,
     NzBreadCrumbModule,
+    NzIconModule,
+    RouterModule,
   ],
   templateUrl: "./account-list.component.html",
   styleUrls: ["./account-list.component.scss"],

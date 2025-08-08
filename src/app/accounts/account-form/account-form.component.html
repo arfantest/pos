@@ -1,333 +1,132 @@
-<div class="p-6 max-w-4xl mx-auto bg-gray-50 min-h-screen">
+<!-- Breadcrumb -->
+<nz-breadcrumb class="mb-6 text-sm">
+  <nz-breadcrumb-item>
+    <a routerLink="/" class="text-blue-600 hover:text-blue-800 transition-colors">
+      <span nz-icon nzType="home" nzTheme="outline" class="align-middle"></span>
+    </a>
+  </nz-breadcrumb-item>
+  <nz-breadcrumb-item>
+    <a routerLink="/accounts" class="text-blue-600 hover:text-blue-800 transition-colors">Accounts</a>
+  </nz-breadcrumb-item>
+  <nz-breadcrumb-item class="text-gray-700 font-medium">
+    {{ isEditMode ? 'Edit Account' : 'Create Account' }}
+  </nz-breadcrumb-item>
+</nz-breadcrumb>
 
-  <nz-breadcrumb class="mb-6">
-    <nz-breadcrumb-item>
-      <a routerLink="/" class="text-blue-600 hover:text-blue-800 transition-colors">
-        <i nz-icon nzType="home" class="text-gray-500 hover:text-blue-600"></i>
-      </a>
-    </nz-breadcrumb-item>
-    <nz-breadcrumb-item>
-      <a routerLink="/accounts" class="text-blue-600 hover:text-blue-800 transition-colors">Accounts</a>
-    </nz-breadcrumb-item>
-    <nz-breadcrumb-item class="text-gray-700 font-medium">
-      {{ isEditMode ? 'Edit Account' : 'Create Account' }}
-    </nz-breadcrumb-item>
-  </nz-breadcrumb>
+<!-- Page Header -->
+<div class="mb-4">
+  <h2 class="text-xl font-semibold text-gray-800">
+    {{ isEditMode ? 'Update Account' : 'New Account' }}
+  </h2>
+  <p class="text-gray-500 mt-1">
+    {{ isEditMode ? 'Update existing account details' : 'Add a new account to your chart of accounts' }}
+  </p>
+</div>
 
-  <!-- Page Header -->
-  <div class="mb-8">
-    <h2 class="text-3xl font-bold text-gray-800">
-      {{ isEditMode ? 'Edit Account' : 'Create New Account' }}
-    </h2>
-    <p class="text-gray-600 mt-2">
-      {{ isEditMode ? 'Update existing account details' : 'Add a new account to your chart of accounts' }}
-    </p>
-  </div>
+<!-- Form Card -->
+<nz-card [nzLoading]="loading" class="shadow-lg rounded-xl border border-gray-200 bg-white p-4">
+  <form nz-form [formGroup]="accountForm" (ngSubmit)="onSubmit()" class="space-y-4">
 
-  <!-- Form Card -->
-  <nz-card [nzLoading]="loading" class="shadow-lg rounded-xl border border-gray-200 bg-white">
-    <form nz-form [formGroup]="accountForm" (ngSubmit)="onSubmit()" class="space-y-6">
-      <!-- Code and Name -->
-      <div nz-row [nzGutter]="24" class="mb-6">
-        <div nz-col nzXs="24" nzSm="12" class="mb-4 sm:mb-0">
-          <nz-form-item>
-            <nz-form-label nzRequired class="font-medium text-gray-700">Account Code</nz-form-label>
-            <nz-form-control nzErrorTip="Please enter a valid code (uppercase letters and numbers only)">
-              <input nz-input formControlName="code" id="code" 
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-400"
-                placeholder="E.g. 1000, CASH, ACC001" />
-            </nz-form-control>
-          </nz-form-item>
-        </div>
-        
-        <div nz-col nzXs="24" nzSm="12">
-          <nz-form-item>
-            <nz-form-label nzRequired class="font-medium text-gray-700">Account Name</nz-form-label>
-            <nz-form-control nzErrorTip="Please enter at least 2 characters">
-              <input nz-input formControlName="name" id="name" 
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-400"
-                placeholder="E.g. Cash on Hand, Accounts Payable" />
-            </nz-form-control>
-          </nz-form-item>
+    <!-- Row 1: Account Code & Name -->
+    <div nz-row [nzGutter]="16">
+      <div nz-col nzSpan="12">
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700">
+            Account Code <span class="text-red-500">*</span>
+          </label>
+          <input nz-input formControlName="code" id="code"
+            class="w-full h-9 px-3 rounded border border-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            placeholder="E.g. 1000, CASH" />
         </div>
       </div>
+      
+      <div nz-col nzSpan="12">
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700">
+            Account Name <span class="text-red-500">*</span>
+          </label>
+          <input nz-input formControlName="name" id="name"
+            class="w-full h-9 px-3 rounded border border-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm"
+            placeholder="E.g. Cash on Hand" />
+        </div>
+      </div>
+    </div>
 
-      <!-- Account Type -->
-      <nz-form-item class="mb-6">
-        <nz-form-label nzRequired class="font-medium text-gray-700">Account Type</nz-form-label>
-        <nz-form-control nzErrorTip="Please select account type">
-          <nz-select formControlName="type" id="type" 
-            nzPlaceHolder="Select account type" nzShowSearch nzAllowClear
-            class="w-full rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200">
+    <!-- Row 2: Account Type, Balance & Status -->
+    <div nz-row [nzGutter]="16">
+      <div nz-col nzSpan="8">
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700">
+            Account Type <span class="text-red-500">*</span>
+          </label>
+          <nz-select formControlName="type" id="type" nzPlaceHolder="Select type" nzShowSearch nzAllowClear
+            class="w-full h-9">
             <nz-option *ngFor="let type of accountTypes" [nzLabel]="type.label" [nzValue]="type.value"
               [nzCustomContent]="true">
-              <div class="py-2 px-3 hover:bg-blue-50 rounded">
-                <div class="font-medium text-gray-800">{{ type.label }}</div>
-                <div class="text-xs text-gray-500 mt-1">{{ type.description }}</div>
+              <div class="py-1 px-2">
+                <div class="font-medium text-gray-800 text-sm">{{ type.label }}</div>
+                <div class="text-xs text-gray-500">{{ type.description }}</div>
               </div>
             </nz-option>
           </nz-select>
-        </nz-form-control>
-      </nz-form-item>
-
-      <!-- Type Description -->
-      <div *ngIf="accountForm.get('type')?.value" class="mb-6 p-4 bg-blue-50 border border-blue-100 rounded-lg text-blue-800 text-sm">
-        <div class="font-semibold mb-1">About this account type:</div>
-        {{ getSelectedTypeDescription() }}
+        </div>
       </div>
 
-      <!-- Balance -->
-      <nz-form-item class="mb-6">
-        <nz-form-label nzRequired class="font-medium text-gray-700">Opening Balance</nz-form-label>
-        <nz-form-control nzErrorTip="Please enter a valid balance (minimum 0)">
-          <nz-input-number formControlName="balance" id="balance" 
-            [nzMin]="0" [nzStep]="0.01" [nzPrecision]="2"
-            class="w-full rounded-lg border-gray-300 hover:border-blue-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"></nz-input-number>
-        </nz-form-control>
-      </nz-form-item>
-
-      <!-- Active Status -->
-      <nz-form-item class="mb-6">
-        <nz-form-label class="font-medium text-gray-700">Account Status</nz-form-label>
-        <nz-form-control>
-          <nz-switch formControlName="isActive" 
-            [nzCheckedChildren]="'Active'" [nzUnCheckedChildren]="'Inactive'"
-            class="bg-gray-300 checked:bg-blue-600"></nz-switch>
-          <span class="text-sm text-gray-500 ml-2">Account will be {{ accountForm.get('isActive')?.value ? 'active' : 'inactive' }}</span>
-        </nz-form-control>
-      </nz-form-item>
-
-      <!-- Description -->
-      <nz-form-item class="mb-6">
-        <nz-form-label class="font-medium text-gray-700">Description</nz-form-label>
-        <nz-form-control>
-          <textarea nz-input formControlName="description" id="description"
-            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all hover:border-blue-400"
-            placeholder="Additional details about this account" rows="4"></textarea>
-        </nz-form-control>
-      </nz-form-item>
-
-      <nz-divider class="my-8 border-gray-200"></nz-divider>
-
-      <!-- Form Actions -->
-      <div class="flex justify-end space-x-4">
-        <button nz-button nzType="default" (click)="onCancel()" [disabled]="submitting"
-          class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors text-gray-700 font-medium">
-          Cancel
-        </button>
-        <button nz-button nzType="primary" [nzLoading]="submitting" [disabled]="!accountForm.valid"
-          class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors font-medium shadow-sm">
-          {{ isEditMode ? 'Update Account' : 'Create Account' }}
-        </button>
+      <div nz-col nzSpan="8">
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700">
+            Opening Balance <span class="text-red-500">*</span>
+          </label>
+          <nz-input-number formControlName="balance" id="balance" [nzMin]="0" [nzStep]="0.01" [nzPrecision]="2"
+            class="w-full h-9" nzPlaceHolder="0.00">
+          </nz-input-number>
+        </div>
       </div>
-    </form>
-  </nz-card>
-</div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- <div class="min-h-[calc(100vh-4rem)] bg-slate-50">
-  <div class="mx-auto max-w-5xl px-4 sm:px-6 py-6">
-
-     Breadcrumb 
-    <nz-breadcrumb class="mb-6">
-      <nz-breadcrumb-item>
-        <a routerLink="/" class="text-slate-500 hover:text-slate-700">
-          <i nz-icon nzType="home" class="text-[18px] align-middle"></i>
-          <span class="sr-only">Home</span>
-        </a>
-      </nz-breadcrumb-item>
-      <nz-breadcrumb-item>
-        <a routerLink="/accounts" class="text-slate-600 hover:text-slate-800">Accounts</a>
-      </nz-breadcrumb-item>
-      <nz-breadcrumb-item>
-        <span class="text-slate-500">{{ isEditMode() ? 'Edit Account' : 'Create Account' }}</span>
-      </nz-breadcrumb-item>
-    </nz-breadcrumb>
-
-     Header 
-    <header class="mb-6">
-      <h1 class="text-2xl font-semibold text-slate-900">
-        {{ isEditMode() ? 'Edit Account' : 'Create New Account' }}
-      </h1>
-      <p class="mt-1 text-slate-500">
-        {{ isEditMode() ? 'Update existing account details' : 'Add a new account to your chart of accounts' }}
-      </p>
-    </header>
-
-     Form Card 
-    <nz-card [nzLoading]="loading()" class="border-0 shadow-sm rounded-xl overflow-hidden">
-      <form nz-form [formGroup]="accountForm" (ngSubmit)="onSubmit()" class="space-y-6">
-
-         Code and Name 
-        <div nz-row [nzGutter]="16" class="gap-y-4">
-          <div nz-col nzXs="24" nzSm="12">
-            <nz-form-item>
-              <nz-form-label nzRequired class="font-medium text-slate-700">Account Code</nz-form-label>
-              <nz-form-control
-                [nzValidateStatus]="accountForm.get('code')"
-                nzErrorTip="Use 2–16 uppercase letters, numbers, or dashes">
-                <input
-                  nz-input
-                  id="code"
-                  formControlName="code"
-                  placeholder="E.g. 1000, CASH, ACC-001"
-                  class="w-full rounded-lg border-slate-200 hover:border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200/60"
-                />
-                <div class="mt-1 text-[12px] text-slate-500">
-                  Tip: We’ll auto-uppercase and strip invalid characters.
-                </div>
-              </nz-form-control>
-            </nz-form-item>
-          </div>
-
-          <div nz-col nzXs="24" nzSm="12">
-            <nz-form-item>
-              <nz-form-label nzRequired class="font-medium text-slate-700">Account Name</nz-form-label>
-              <nz-form-control
-                [nzValidateStatus]="accountForm.get('name')"
-                nzErrorTip="Please enter at least 2 characters">
-                <input
-                  nz-input
-                  id="name"
-                  formControlName="name"
-                  placeholder="E.g. Cash on Hand, Accounts Payable"
-                  class="w-full rounded-lg border-slate-200 hover:border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200/60"
-                />
-              </nz-form-control>
-            </nz-form-item>
+      <div nz-col nzSpan="8">
+        <div class="space-y-1">
+          <label class="block text-sm font-medium text-gray-700">Status</label>
+          <div class="flex items-center h-9">
+            <nz-switch formControlName="isActive" [nzCheckedChildren]="'Active'" [nzUnCheckedChildren]="'Inactive'">
+            </nz-switch>
+            <span class="text-xs text-gray-500 ml-2">
+              {{ accountForm.get('isActive')?.value ? 'Active' : 'Inactive' }}
+            </span>
           </div>
         </div>
+      </div>
+    </div>
 
-         Account Type 
-        <nz-form-item>
-          <nz-form-label nzRequired class="font-medium text-slate-700">Account Type</nz-form-label>
-          <nz-form-control
-            [nzValidateStatus]="accountForm.get('type')"
-            nzErrorTip="Please select an account type">
-            <nz-select
-              id="type"
-              formControlName="type"
-              nzPlaceHolder="Select account type"
-              nzShowSearch
-              nzAllowClear
-              class="w-full [&_.ant-select-selector]:rounded-lg [&_.ant-select-selector]:border-slate-200"
-            >
-              <nz-option
-                *ngFor="let type of accountTypes"
-                [nzLabel]="type.label"
-                [nzValue]="type.value"
-                [nzCustomContent]="true"
-              >
-                <div class="py-1.5">
-                  <div class="font-medium text-slate-800">{{ type.label }}</div>
-                  <div class="text-xs text-slate-500">{{ type.description }}</div>
-                </div>
-              </nz-option>
-            </nz-select>
-          </nz-form-control>
-        </nz-form-item>
+    <!-- Type Description (Full Width) -->
+    <div *ngIf="accountForm.get('type')?.value"
+      class="p-3 bg-blue-50 border border-blue-100 rounded text-blue-800 text-xs">
+      <div class="font-medium mb-1">About this account type:</div>
+      {{ getSelectedTypeDescription() }}
+    </div>
 
-         Type Description Helper 
-        <div *ngIf="accountForm.get('type')?.value"
-             class="flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-emerald-800">
-          <i nz-icon nzType="info-circle" class="mt-0.5 text-emerald-500"></i>
-          <span class="text-sm">{{ getSelectedTypeDescription() }}</span>
-        </div>
+    <!-- Description (Full Width) -->
+    <div class="space-y-1">
+      <label class="block text-sm font-medium text-gray-700">Description</label>
+      <textarea nz-input formControlName="description" id="description"
+        class="w-full px-3 py-2 rounded border border-gray-300 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm resize-none"
+        placeholder="Additional details about this account" rows="2">
+      </textarea>
+    </div>
 
-         Opening Balance 
-        <nz-form-item>
-          <nz-form-label nzRequired class="font-medium text-slate-700">Opening Balance</nz-form-label>
-          <nz-form-control
-            [nzValidateStatus]="accountForm.get('balance')"
-            nzErrorTip="Please enter a valid balance (minimum 0)">
-            <nz-input-number
-              id="balance"
-              formControlName="balance"
-              [nzMin]="0"
-              [nzStep]="0.01"
-              [nzPrecision]="2"
-              class="w-full [&_.ant-input-number-input]:text-right [&_.ant-input-number]:rounded-lg [&_.ant-input-number]:border-slate-200"
-            ></nz-input-number>
-          </nz-form-control>
-        </nz-form-item>
+    <div class="border-t border-gray-200 my-4"></div>
 
-         Status 
-        <nz-form-item>
-          <nz-form-label class="font-medium text-slate-700">Account Status</nz-form-label>
-          <nz-form-control>
-            <div class="inline-flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2">
-              <nz-switch
-                formControlName="isActive"
-                [nzCheckedChildren]="'Active'"
-                [nzUnCheckedChildren]="'Inactive'"
-              ></nz-switch>
-            </div>
-          </nz-form-control>
-        </nz-form-item>
+    <!-- Actions -->
+    <div class="flex justify-end gap-2 pt-2">
+      <button nz-button nzType="default" (click)="onCancel()" [disabled]="submitting" class="min-w-[90px] h-8 px-4 border border-gray-300 rounded text-gray-700 text-sm
+               hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-300">
+        Cancel
+      </button>
 
-         Description 
-        <nz-form-item>
-          <nz-form-label class="font-medium text-slate-700">Description</nz-form-label>
-          <nz-form-control>
-            <textarea
-              nz-input
-              id="description"
-              formControlName="description"
-              rows="3"
-              placeholder="Additional details about this account"
-              class="w-full rounded-lg border-slate-200 hover:border-slate-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200/60"
-            ></textarea>
-          </nz-form-control>
-        </nz-form-item>
+      <button nz-button nzType="primary" [nzLoading]="submitting" [disabled]="!accountForm.valid" class="min-w-[120px] h-8 px-4 bg-blue-600 text-white rounded text-sm
+               hover:bg-blue-700 focus:outline-none focus:ring-1 focus:ring-blue-500">
+        {{ isEditMode ? 'Update Account' : 'Create Account' }}
+      </button>
+    </div>
 
-        <nz-divider class="my-2"></nz-divider>
-
-         Actions 
-        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-          <button
-            nz-button
-            nzType="default"
-            (click)="onCancel()"
-            [disabled]="submitting()"
-            class="rounded-lg px-4 py-2 hover:bg-slate-100"
-            type="button"
-          >
-            Cancel
-          </button>
-
-          <button
-            nz-button
-            nzType="primary"
-            [nzLoading]="submitting()"
-            [disabled]="accountForm.invalid"
-            class="rounded-lg bg-emerald-600 px-4 py-2 text-white hover:bg-emerald-700"
-          >
-            {{ isEditMode() ? 'Update Account' : 'Create Account' }}
-          </button>
-        </div>
-      </form>
-    </nz-card>
-  </div>
-</div> -->
+  </form>
+</nz-card>

@@ -57,13 +57,9 @@ export const routes: Routes = [
         loadComponent: () => import("./accounting/reports/reports").then((m) => m.JournalEntriesTableComponent)
       },
       {
-        path: "account-form",
-        loadComponent: () => import("./accounts/account-form/account-form.component").then((m) => m.AccountFormComponent)
-      },
-      {
-        path: "account-list",
-        loadComponent: () => import("./accounts/account-list/account-list.component").then((m) => m.AccountListComponent)
-      },
+        path: "accounts",
+        loadChildren: () => import("./accounts/account.routes").then((m) => m.routes)
+      }
     ],
   },
 ]

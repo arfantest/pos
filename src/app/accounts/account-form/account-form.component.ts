@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { ActivatedRoute, Router } from "@angular/router";
+import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { NzMessageService } from "ng-zorro-antd/message";
 import { AccountService } from "../../core/services/account.service";
 import { CreateAccountDto } from "../../core/models/account.model";
@@ -38,6 +38,7 @@ import { NzSwitchModule } from "ng-zorro-antd/switch";
     NzIconModule,
     NzAlertModule,
     NzSwitchModule,
+    RouterModule,
   ],
   templateUrl: "./account-form.component.html",
   styleUrls: ["./account-form.component.scss"],
@@ -92,7 +93,7 @@ export class AccountFormComponent implements OnInit {
           name: account.name,
           type: account.type,
           description: account.description,
-          balance: account.balance,
+          balance: Number(account.balance),
           isActive: account.isActive
         });
         this.loading = false;
@@ -131,8 +132,7 @@ export class AccountFormComponent implements OnInit {
             this.router.navigate(["/accounts"]);
           }
 
-
-          // this.router.navigate(["/accounts"]);
+          this.router.navigate(["/accounts"]);
         },
         error: (error) => {
           console.error("Error saving account:", error);

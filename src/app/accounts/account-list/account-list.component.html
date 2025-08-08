@@ -1,18 +1,14 @@
 <div class="account-list-container">
-  <nz-breadcrumb>
-    <nz-breadcrumb-item>
-      <i nz-icon nzType="home"></i>
-    </nz-breadcrumb-item>
-    <nz-breadcrumb-item>Account Management</nz-breadcrumb-item>
-  </nz-breadcrumb>
-
   <div class="page-header">
     <div class="header-content">
       <h2>Chart of Accounts</h2>
-      <button nz-button nzType="primary" routerLink="/accounts/new">
-        <i nz-icon nzType="plus"></i>
-        Add Account
+      <button nz-button nzType="primary" routerLink="/accounts/new"
+        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md shadow-sm transition-all duration-200">
+
+        <i nz-icon nzType="plus" nzTheme="outline" class="text-white"></i>
+        <span class="text-white font-medium">Add Account</span>
       </button>
+
     </div>
   </div>
 
@@ -56,30 +52,34 @@
               {{ account.isActive ? 'Active' : 'Inactive' }}
             </nz-tag>
           </td>
-          <td>
-            <a nz-dropdown [nzDropdownMenu]="menu" nzPlacement="bottomLeft">
+          <td class="text-center">
+            <!-- Trigger Button -->
+            <button nz-button nzShape="circle" nzType="default" nz-dropdown [nzDropdownMenu]="menu"
+              nzPlacement="bottomLeft" class="shadow-sm hover:shadow transition-all duration-200">
               <i nz-icon nzType="more" nzTheme="outline"></i>
-            </a>
+            </button>
+
+            <!-- Dropdown Menu -->
             <nz-dropdown-menu #menu="nzDropdownMenu">
               <ul nz-menu>
                 <li nz-menu-item (click)="viewAccount(account)">
-                  <i nz-icon nzType="eye"></i>
+                  <i nz-icon nzType="eye" class="mr-2"></i>
                   View Details
                 </li>
                 <li nz-menu-item (click)="editAccount(account)">
-                  <i nz-icon nzType="edit"></i>
+                  <i nz-icon nzType="edit" class="mr-2"></i>
                   Edit
                 </li>
                 <li nz-menu-divider></li>
-                <li nz-menu-item nz-popconfirm 
-                    nzPopconfirmTitle="Are you sure you want to delete this account?"
-                    (nzOnConfirm)="deleteAccount(account)">
-                  <i nz-icon nzType="delete" style="color: #ff4d4f;"></i>
+                <li nz-menu-item nz-popconfirm nzPopconfirmTitle="Are you sure you want to delete this account?"
+                  (nzOnConfirm)="deleteAccount(account)">
+                  <i nz-icon nzType="delete" style="color: #ff4d4f;" class="mr-2"></i>
                   <span style="color: #ff4d4f;">Delete</span>
                 </li>
               </ul>
             </nz-dropdown-menu>
           </td>
+
         </tr>
       </tbody>
     </nz-table>
