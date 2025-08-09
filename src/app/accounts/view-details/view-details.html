@@ -1,0 +1,189 @@
+<!-- <div class="container" *ngIf="!isLoading; else loading">
+  <nz-card nzTitle="Account Details - {{account.code}}">
+    <div nz-row>
+      <div nz-col nzSpan="24">
+        <nz-divider nzText="Basic Information" nzOrientation="left"></nz-divider>
+      </div>
+      
+      <div nz-col nzSpan="12">
+        <p><strong>Account ID:</strong> {{ account.id }}</p>
+        <p><strong>Code:</strong> {{ account.code }}</p>
+        <p><strong>Name:</strong> {{ account.name }}</p>
+        <p><strong>Type:</strong> 
+          <nz-tag [nzColor]="getTagColor(account.type)">
+            {{ getAccountTypeName(account.type) }}
+          </nz-tag>
+        </p>
+      </div>
+      
+      <div nz-col nzSpan="12">
+        <p><strong>Balance:</strong> {{ account.balance | currency }}</p>
+        <p><strong>Status:</strong> 
+          <nz-tag [nzColor]="account.isActive ? 'green' : 'red'">
+            {{ account.isActive ? 'Active' : 'Inactive' }}
+          </nz-tag>
+        </p>
+        <p><strong>Created:</strong> {{ account.createdAt | date }}</p>
+        <p><strong>Updated:</strong> {{ account.updatedAt | date }}</p>
+      </div>
+      
+      <div nz-col nzSpan="24" *ngIf="account.description">
+        <nz-divider nzText="Description" nzOrientation="left"></nz-divider>
+        <p>{{ account.description }}</p>
+      </div>
+    </div>
+  </nz-card>
+  
+  <button nz-button nzType="default" (click)="goBack()" class="mt-3">
+    <i nz-icon nzType="arrow-left"></i> Back
+  </button>
+</div>
+
+<ng-template #loading>
+  <div class="text-center mt-5">
+    <nz-spin nzSize="large"></nz-spin>
+  </div>
+</ng-template> -->
+
+
+
+
+
+<div class="container" *ngIf="!isLoading; else loading">
+  <nz-card 
+    nzTitle="Account Details - {{account.code}}" 
+    [nzBordered]="true"
+    [nzBodyStyle]="{padding: '24px'}"
+    class="shadow-sm"
+  >
+    <div nz-row [nzGutter]="[16, 16]">
+      <!-- Basic Information Section -->
+      <div nz-col nzSpan="24">
+        <nz-divider nzText="Basic Information" nzOrientation="left" class="font-semibold"></nz-divider>
+      </div>
+      
+      <!-- Left Column -->
+      <div nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="12" nzXl="12">
+        <div class="detail-item">
+          <label class="detail-label">Account ID:</label>
+          <span class="detail-value">{{ account.id }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <label class="detail-label">Code:</label>
+          <span class="detail-value">{{ account.code }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <label class="detail-label">Name:</label>
+          <span class="detail-value">{{ account.name }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <label class="detail-label">Type:</label>
+          <span class="detail-value">
+            <nz-tag [nzColor]="getTagColor(account.type)" class="font-medium">
+              {{ getAccountTypeName(account.type) }}
+            </nz-tag>
+          </span>
+        </div>
+      </div>
+      
+      <!-- Right Column -->
+      <div nz-col nzXs="24" nzSm="24" nzMd="12" nzLg="12" nzXl="12">
+        <div class="detail-item">
+          <label class="detail-label">Balance:</label>
+          <span class="detail-value font-semibold text-blue-600">{{ account.balance | currency }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <label class="detail-label">Status:</label>
+          <span class="detail-value">
+            <nz-tag [nzColor]="account.isActive ? 'green' : 'red'" class="font-medium">
+              {{ account.isActive ? 'Active' : 'Inactive' }}
+            </nz-tag>
+          </span>
+        </div>
+        
+        <div class="detail-item">
+          <label class="detail-label">Created:</label>
+          <span class="detail-value">{{ account.createdAt | date:'mediumDate' }}</span>
+        </div>
+        
+        <div class="detail-item">
+          <label class="detail-label">Updated:</label>
+          <span class="detail-value">{{ account.updatedAt | date:'mediumDate' }}</span>
+        </div>
+      </div>
+      
+      <!-- Description Section -->
+      <div nz-col nzSpan="24" *ngIf="account.description">
+        <nz-divider nzText="Description" nzOrientation="left" class="font-semibold"></nz-divider>
+        <div class="bg-gray-50 p-4 rounded-md border border-gray-100">
+          <p class="text-gray-700">{{ account.description }}</p>
+        </div>
+      </div>
+    </div>
+  </nz-card>
+  
+  <div class="mt-6">
+    <button 
+      nz-button 
+      nzType="default" 
+      (click)="goBack()" 
+      class="mr-2"
+      nzShape="round"
+    >
+      <i nz-icon nzType="arrow-left" class="mr-1"></i> Back to List
+    </button>
+    
+    <button 
+      nz-button 
+      nzType="primary" 
+      *ngIf="account.isActive"
+      nzShape="round"
+    >
+      <i nz-icon nzType="transaction" class="mr-1"></i> Make Transaction
+    </button>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="flex items-center justify-center h-64">
+    <nz-spin nzSize="large" nzTip="Loading account details..."></nz-spin>
+  </div>
+</ng-template>
+
+<!-- Add this to your component's styles -->
+<style>
+  .detail-item {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .detail-label {
+    width: 120px;
+    color: #666;
+    font-weight: 500;
+  }
+  
+  .detail-value {
+    flex: 1;
+    color: #333;
+  }
+  
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  nz-card {
+    border-radius: 8px;
+  }
+  
+  nz-divider {
+    margin: 16px 0 24px 0 !important;
+  }
+</style>

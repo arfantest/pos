@@ -59,7 +59,11 @@ export const routes: Routes = [
       {
         path: "accounts",
         loadChildren: () => import("./accounts/account.routes").then((m) => m.routes)
-      }
+      }, 
+      {
+        path: 'view-details/:id',
+        loadComponent: () => import("./accounts/view-details/view-details").then((m) => m.ViewDetails),
+      },
     ],
   },
 ]

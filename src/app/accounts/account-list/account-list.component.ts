@@ -15,6 +15,7 @@ import { NzBreadCrumbModule } from "ng-zorro-antd/breadcrumb"
 import { FormsModule, ReactiveFormsModule } from "@angular/forms"
 import { CommonModule } from "@angular/common"
 import { NzIconModule } from "ng-zorro-antd/icon"
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 
 @Component({
   selector: "app-account-list",
@@ -34,6 +35,7 @@ import { NzIconModule } from "ng-zorro-antd/icon"
     NzBreadCrumbModule,
     NzIconModule,
     RouterModule,
+    NzPopconfirmModule
   ],
   templateUrl: "./account-list.component.html",
   styleUrls: ["./account-list.component.scss"],
@@ -48,7 +50,7 @@ export class AccountListComponent implements OnInit {
     private accountService: AccountService,
     private router: Router,
     private message: NzMessageService,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadAccounts()
@@ -80,7 +82,7 @@ export class AccountListComponent implements OnInit {
   }
 
   viewAccount(account: Account): void {
-    this.router.navigate(["/accounts", account.id])
+    this.router.navigate(["/view-details", account.id])
   }
 
   editAccount(account: Account): void {
@@ -88,6 +90,7 @@ export class AccountListComponent implements OnInit {
   }
 
   deleteAccount(account: Account): void {
+    // debugger
     this.accountService.deleteAccount(account.id).subscribe({
       next: () => {
         this.message.success("Account deleted successfully")
@@ -101,21 +104,21 @@ export class AccountListComponent implements OnInit {
   }
 
   getAccountTypeColor(type: AccountType): string {
-  switch (type) {
-    case AccountType.ASSET:
-      return "blue";
-    case AccountType.LIABILITY:
-      return "red";
-    case AccountType.EQUITY:
-      return "purple";
-    case AccountType.INCOME:
-      return "green";
-    case AccountType.EXPENSE:
-      return "orange";
-    default:
-      return "default";
+    switch (type) {
+      case AccountType.ASSET:
+        return "blue";
+      case AccountType.LIABILITY:
+        return "red";
+      case AccountType.EQUITY:
+        return "purple";
+      case AccountType.INCOME:
+        return "green";
+      case AccountType.EXPENSE:
+        return "orange";
+      default:
+        return "default";
+    }
   }
-}
 
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat("en-US", {

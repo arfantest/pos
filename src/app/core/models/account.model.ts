@@ -48,3 +48,11 @@ export interface CreateAccountDto {
   isActive?: boolean
 }
 
+// export interface Account {
+//   id: string;
+//   name: string;
+//   email?: string;
+//   phone?: string;
+//   address?: string;
+//   createdAt?: Date;
+// }
